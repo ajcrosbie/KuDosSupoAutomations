@@ -17,5 +17,9 @@ The structure of directories should follow this design:
 ├── includes.tex
 └── template.tex
 ```
-You also need to update the contents of template.tex so that this line \input{./includes.tex} to \input{../../../includes.tex}
+You also need to update the contents of template.tex so that this line 
+`\input{./includes.tex}` 
+to 
+`\input{../../../includes.tex}`
+
 Finally you need to load your auth cookie into a .env file.
