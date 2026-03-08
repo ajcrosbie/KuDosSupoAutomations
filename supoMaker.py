@@ -1,3 +1,5 @@
+#!/home/aaron/miniconda3/envs/autoKudos/bin/python3
+
 import argparse
 import requests
 import os
@@ -6,6 +8,7 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
+
 COOKIE = os.getenv("KUDOS_COOKIE")
 if COOKIE is None:
     raise ValueError("KUDOS_COOKIE environment variable not set.")
@@ -13,9 +16,10 @@ if COOKIE is None:
 session = requests.Session()
 session.cookies.set("KuDoSAuth", COOKIE)
 
+def normalize(s: str) -> str:
+    return re.sub(r'[^a-z0-9]', '', s.lower())
 
 def getInfoFile():
-    # Fetch supervisions
     assignments = session.get(
         "https://kudos.chu.cam.ac.uk/kudos/rest/supervisions/getSVAssignments"
     ).json()
@@ -26,7 +30,7 @@ def getInfoFile():
 
     # As this is a list for all supervisions cannot directly access, need to loop
     for sv in assignments:
-        if re.sub(r'[^a-zA-Z0-9]', '',(sv["group"][0]["course"].lower())) != subject: # There SHOULD be only one match. If not add delimilor for year group too.
+        if normalize(sv["group"][0]["course"].lower()) != normalize(subject):
             continue
 
         supervisor_crsid = sv["supervisor"]["CRSID"]  
@@ -62,7 +66,7 @@ def makeModifiedSupo():
     os.system("latexmk modifiedSupo.tex > /dev/null 2>&1")
     
     # if not using a build directory no need to move to top level.
-    if not os.path.exists("build/modifiedSupo.pdf`"):
+    if not os.path.exists("build/modifiedSupo.pdf"):
         return 
 
     with open("build/modifiedSupo.pdf", "rb") as f:
